@@ -8,12 +8,12 @@ const renderer = new THREE.WebGLRenderer({antialias:true});
 const light = new THREE.AmbientLight( 0x404040 );
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-const loader = new THREE.OBJLoader();
+const loader = new THREE.GLTFLoader();
 
 function main() {
 	document.body.appendChild(renderer.domElement);
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	scene.add( cube );
+	//scene.add( cube );
 	
 	//scene.add( directionalLight );
 	camera.position.z = 5;
@@ -26,35 +26,23 @@ function main() {
     const light1 = new THREE.DirectionalLight(light1_color, light1_intensity);
     light1.position.set(light1_x, light1_y, light1_z);
     scene.add(light1);
-    scene.add(light)
-// 	loader.load(
-// 	// resource URL
-// 	'models/minecraft-steve.obj',
-// 	// called when resource is loaded
-// 	function ( object ) {
 
-// 		scene.add( object );
+    scene.add(light);
+	loader.load( '../models/scene.gltf', function ( gltf ) {
 
-// 	},
-// 	// called when loading is in progresses
-// 	function ( xhr ) {
+	scene.add( gltf.scene );
 
-// 		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+	}, undefined, function ( error ) {
 
-// 	},
-// 	// called when loading has errors
-// 	function ( error ) {
+	console.error( error );
 
-// 		console.log( 'An error happened' );
+	} );
 
-// 	}
-// );
-
-// 	var backgroundButton = document.getElementById('change-Lighting');
-// 	backgroundButton.addEventListener('click', function(){
+	var backgroundButton = document.getElementById('change-Lighting');
+	backgroundButton.addEventListener('click', function(){
    		
-// 	});
-// // Alternatively, to parse a previously loaded JSON structure
+	});
+// Alternatively, to parse a previously loaded JSON structure
 
 	animate();
 }
