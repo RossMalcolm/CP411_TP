@@ -12,6 +12,7 @@ const loader = new THREE.GLTFLoader();
 var car1 = new THREE.Object3D();
 var car2 = new THREE.Object3D();
 var car3 = new THREE.Object3D();
+var currentCar = new THREE.Object3D
 var scene = new THREE.Scene();
 
 function main() {
@@ -60,8 +61,9 @@ function main() {
         car1.position.x = 1; // once rescaled, position the model where needed
         car1.position.z = -35;
         car1.position.y = 35;
-
-		scene.add( car1 );
+        //car1.visible = false;
+        currentCar = car1;
+		scene.add(car1);
 
 	}, undefined, function ( error ) {
 
@@ -75,8 +77,9 @@ function main() {
         car2.position.x = 1; // once rescaled, position the model where needed
         car2.position.z = -35;
         car2.position.y = -25;
+        //car2.visibile = false;
 
-		scene.add(car2);
+		//scene.add(car2);
 
 	}, undefined, function (error) {
 		console.error(error);
@@ -89,16 +92,16 @@ function main() {
         car3.position.x = 1; // once rescaled, position the model where needed
         car3.position.z = -35;
         car3.position.y = 0;
+        //car3.visibile = false;
 
-		scene.add(car3);
+		//scene.add(car3);
 
 	}, undefined, function (error) {
 		console.error(error);
 	});
 
 	init_buttons();
-	car3.visibile = false;
-	car2.visibile = false;
+	
 // Alternatively, to parse a previously loaded JSON structure
 	animate();
 }
@@ -106,19 +109,22 @@ function main() {
 function init_buttons(){
 	var backgroundButton = document.getElementById('scene');
 	backgroundButton.addEventListener('click', function(){
-	
+		scene.remove(currentCar);
+		scene.add(car1);
    		
 	});
 
 	var backgroundButton = document.getElementById('scene2');
 	backgroundButton.addEventListener('click', function(){
-		
+		scene.remove(currentCar);
+		scene.add(car2);
    		
 	});
 
 	var backgroundButton = document.getElementById('scene3');
 	backgroundButton.addEventListener('click', function(){
-		
+		scene.remove(currentCar);
+		scene.add(car3);
    		
 	});
 }
