@@ -35,8 +35,42 @@ function main() {
     light2.position.set(light1_x, light1_y, light1_z);
     const light3 = new THREE.DirectionalLight(light1_color, light1_intensity);
     light3.position.set(light1_x, light1_y, light1_z);
+    const spotLight = new THREE.SpotLight( 0xffffff );
+	spotLight.position.set( 100, 1000, 100 );
+
+	spotLight.castShadow = true;
+
+	spotLight.shadow.mapSize.width = 1024;
+	spotLight.shadow.mapSize.height = 1024;
+
+	spotLight.shadow.camera.near = 500;
+	spotLight.shadow.camera.far = 4000;
+	spotLight.shadow.camera.fov = 30;
+	const spotLight2 = new THREE.SpotLight( 0xffffff );
+	spotLight2.position.set( 100, 1000, 100);
+
+	spotLight2.castShadow = true;
+
+	spotLight2.shadow.mapSize.width = 1024;
+	spotLight2.shadow.mapSize.height = 1024;
+
+	spotLight2.shadow.camera.near = 500;
+	spotLight2.shadow.camera.far = 4000;
+	spotLight2.shadow.camera.fov = 30
+	const spotLight3 = new THREE.SpotLight( 0xffffff );
+	spotLight3.position.set( 100, 1000, 100 );
+
+	spotLight3.castShadow = true;
+
+	spotLight3.shadow.mapSize.width = 1024;
+	spotLight3.shadow.mapSize.height = 1024;
+
+	spotLight3.shadow.camera.near = 500;
+	spotLight3.shadow.camera.far = 4000;
+	spotLight3.shadow.camera.fov = 30
 
     scene.add(light1);
+    scene.add(spotLight);
     scene.add(directionalLight);
     scene.add(light);
 	loader.load( '../models/buster/scene.gltf', function ( gltf ) {
@@ -55,10 +89,11 @@ function main() {
     
 
 	scene2.add(light2);
+	scene2.add(spotLight2);
 	scene2.add(directionalLight);
 	scene2.add(light);
 	loader.load( '../models/headphones/scene.gltf', function(gltf){
-		gltf.scene.scale.multiplyScalar(3/4); // adjust scalar factor to match your scene scale
+		gltf.scene.scale.multiplyScalar(30); // adjust scalar factor to match your scene scale
         gltf.scene.position.x = 1; // once rescaled, position the model where needed
         gltf.scene.position.z = -35;
         gltf.scene.position.y = -25;
@@ -71,6 +106,7 @@ function main() {
 	
 
 	scene3.add(light3);
+	scene3.add(spotLight3);
 	scene3.add(directionalLight);
 	scene3.add(light);
 	loader.load( '../models/gun/scene.gltf', function(gltf){
