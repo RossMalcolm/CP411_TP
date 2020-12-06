@@ -1,7 +1,4 @@
 const clock = new THREE.Clock();
-const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-const material = new THREE.MeshPhongMaterial( {color: 0xffffff} );
-const cube = new THREE.Mesh( geometry, material );
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({antialias:true});
@@ -11,8 +8,8 @@ const controls_movement = new THREE.MapControls( camera, renderer.domElement );
 controls_movement.enableDamping = true; // an animation loop is 
 controls_movement.dampingFactor = 0.05;
 controls_movement.screenSpacePanning = false;
-controls_movement.minDistance = 10;
-controls_movement.maxDistance = 50;
+controls_movement.minDistance = 5;
+controls_movement.maxDistance = 25;
 controls_movement.maxPolarAngle = Math.PI / 2;
 var light1;
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
@@ -22,15 +19,16 @@ var guiValues;
 function main() {
 	document.body.appendChild(renderer.domElement);
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	scene.add( cube );
 	
 	//scene.add( directionalLight );
-	camera.position.z = 5;
+	camera.position.x = 0;
+	camera.position.y = 5;
+	camera.position.z = 20;
 
-	const light1_x = 0.5;
-    const light1_y = 0.5;
-    const light1_z = 0.5;
-    const light1_color = new THREE.Color(255, 255, 255);
+	const light1_x = 0.0;
+    const light1_y = 0.0;
+    const light1_z = 0.0;
+    const light1_color = new THREE.Color(1, 1, 1);
     const light1_intensity = 1;
     light1 = new THREE.DirectionalLight(light1_color, light1_intensity);
     light1.position.set(light1_x, light1_y, light1_z);
@@ -38,7 +36,7 @@ function main() {
     scene.add(light1);
     scene.add(light);
 	
-	loader.load( '../models/scene.gltf', function ( gltf ) {
+	loader.load( '../models/80s_warehouse/scene.gltf', function ( gltf ) {
 
 	scene.add(gltf.scene);
 
