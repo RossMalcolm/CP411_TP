@@ -1,11 +1,6 @@
-
-const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-const material = new THREE.MeshPhongMaterial( {color: 0x00ff00} );
-const cube = new THREE.Mesh( geometry, material );
-var currentScene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({antialias:true});
-const light = new THREE.AmbientLight( 0x404040, 25);
+const ambientLight = new THREE.AmbientLight( 0x404040, 25);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 const loader = new THREE.GLTFLoader();
@@ -19,7 +14,6 @@ function main() {
 
 	document.body.appendChild(renderer.domElement);
 	renderer.setSize(window.innerWidth, window.innerHeight);
-
 	document.body.addEventListener('keydown', keyPressed);
 
 	camera.position.z = 250;
@@ -29,12 +23,8 @@ function main() {
     const light1_z = 1;
     const light1_color = 0xFFFFFF;
     const light1_intensity = 1;
-    const light1 = new THREE.DirectionalLight(light1_color, light1_intensity);
-    light1.position.set(light1_x, light1_y, light1_z);
-    const light2 = new THREE.DirectionalLight(light1_color, light1_intensity);
-    light2.position.set(light1_x, light1_y, light1_z);
-    const light3 = new THREE.DirectionalLight(light1_color, light1_intensity);
-    light3.position.set(light1_x, light1_y, light1_z);
+    const light = new THREE.DirectionalLight(light1_color, light1_intensity);
+    light.position.set(light1_x, light1_y, light1_z);
 
 
     const spotLight = new THREE.SpotLight( 0xffffff );
@@ -49,12 +39,19 @@ function main() {
 	spotLight.shadow.camera.far = 4000;
 	spotLight.shadow.camera.fov = 30;
 
-
-    scene.add(light1);
+	scene.add(ambientLight);
     scene.add(spotLight);
     scene.add(directionalLight);
     scene.add(light);
 
+    init_gltf();
+	init_buttons();
+	
+// Alternatively, to parse a previously loaded JSON structure
+	animate();
+}
+
+function init_gltf(){
 	loader.load( '../models/car1/scene.gltf', function ( gltf ) {
 		car1 = gltf.scene;
 		car1.scale.multiplyScalar(1.2); // adjust scalar factor to match your scene scale
@@ -99,11 +96,6 @@ function main() {
 	}, undefined, function (error) {
 		console.error(error);
 	});
-
-	init_buttons();
-	
-// Alternatively, to parse a previously loaded JSON structure
-	animate();
 }
 
 function init_buttons(){
