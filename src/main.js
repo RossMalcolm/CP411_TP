@@ -102,21 +102,24 @@ function init_buttons(){
 	var backgroundButton = document.getElementById('scene');
 	backgroundButton.addEventListener('click', function(){
 		scene.remove(currentCar);
-		scene.add(car1);
+		currentCar = car1
+		scene.add(currentCar);
    		
 	});
 
 	var backgroundButton = document.getElementById('scene2');
 	backgroundButton.addEventListener('click', function(){
 		scene.remove(currentCar);
-		scene.add(car2);
+		currentCar = car2
+		scene.add(currentCar);
    		
 	});
 
 	var backgroundButton = document.getElementById('scene3');
 	backgroundButton.addEventListener('click', function(){
 		scene.remove(currentCar);
-		scene.add(car3);
+		currentCar = car3
+		scene.add(currentCar);
    		
 	});
 }
