@@ -14,24 +14,26 @@ let spotLight3;
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 const controls_movement = new THREE.MapControls( camera, renderer.domElement );
 controls_movement.enableDamping = true; // an animation loop is 
-controls_movement.dampingFactor = 0.05;
-controls_movement.screenSpacePanning = false;
-controls_movement.minDistance = 5;
-controls_movement.maxDistance = 300;
-controls_movement.maxPolarAngle = Math.PI / 2;
+
 // Model Loader and models
 const loader = new THREE.GLTFLoader();
 var car1 = new THREE.Object3D();
+const car1position = new THREE.Vector3(-10, 59, 0);
 var car2 = new THREE.Object3D();
+const car2position = THREE.Vector3(300, 22, 0);
 var car3 = new THREE.Object3D();
-var currentCar = new THREE.Object3D;
+const car3position = THREE.Vector3(600, 21, 0);
+var currentCar = new THREE.Object3D();
 var showroom = new THREE.Object3D();
 // Var for slider Values
 var guiValues;
+
 // Misc
 var light1_offsetx = -10;
 var light2_offsetx = 293;
 var light3_offsetx = 594;
+var freeRotate = false;
+
 
 function main() {
 	document.body.appendChild(renderer.domElement);
@@ -42,6 +44,13 @@ function main() {
 	camera.position.x = 0;
 	camera.position.y = 20;
 	camera.position.z = 200;
+
+	//initializes movement controls
+	controls_movement.dampingFactor = 0.05;
+	controls_movement.screenSpacePanning = false;
+	controls_movement.minDistance = 5;
+	controls_movement.maxDistance = 300;
+	controls_movement.maxPolarAngle = Math.PI / 2;
 
 	// Adds a directional light
 	const light1_x = 0.0;
@@ -104,6 +113,8 @@ function init_gltf(){
         car1.position.x = -10; // once rescaled, position the model where needed
         car1.position.y = 59;
         car1.position.z = 0;
+        car1.name = 'car1';
+       
         //car1.visible = false;
         currentCar = car1;
 		scene.add(car1);
@@ -118,6 +129,8 @@ function init_gltf(){
         car2.position.x = 300; // once rescaled, position the model where needed
         car2.position.y = 22;
         car2.position.z = 0;
+        car2.name = 'car2';
+       
         //car2.visibile = false;
 		scene.add(car2);
 	}, undefined, function (error) {
@@ -131,6 +144,8 @@ function init_gltf(){
         car3.position.x = 600; // once rescaled, position the model where needed
         car3.position.y = 21;
         car3.position.z = 0;
+        car3.name = 'car3';
+        
         //car3.visibile = false;
 		scene.add(car3);
 	}, undefined, function (error) {
@@ -154,35 +169,93 @@ function init_gltf(){
 function init_buttons(){
 	var backgroundButton = document.getElementById('scene');
 	backgroundButton.addEventListener('click', function(){
-		scene.remove(currentCar);
-		currentCar = car1
-		scene.add(currentCar);
-		controls.enabled = true;
-		controls_movement.enabled = false;
+		if(freeRotate == false){
+			if(scene.getObjectByName('car1')){
+				scene.remove(car1);
+			}else{
+				scene.add(car1);
+			}
+		}else{
+			scene.remove(car1)
+			scene.remove(car2)
+			scene.remove(car3)
+			scene.add(car1)
+		}
+		
 	});
 
 	var backgroundButton = document.getElementById('scene2');
 	backgroundButton.addEventListener('click', function(){
-		scene.remove(currentCar);
-		currentCar = car2
-		scene.add(currentCar);
-		controls.enabled = true;
-		controls_movement.enabled = false;
+		if(freeRotate == false){
+			if(scene.getObjectByName('car2')){
+				scene.remove(car2);
+			}else{
+				scene.add(car2);
+			}
+		}else{
+			scene.remove(car1)
+			scene.remove(car2)
+			scene.remove(car3)
+			scene.add(car2)
+		}
 	});
 
 	var backgroundButton = document.getElementById('scene3');
 	backgroundButton.addEventListener('click', function(){
-		scene.remove(currentCar);
-		currentCar = car3
-		scene.add(currentCar);
-		controls.enabled = true;
-		controls_movement.enabled = false;
+		if(freeRotate == false){
+			if(scene.getObjectByName('car3')){
+				scene.remove(car3);
+			}else{
+				scene.add(car3);
+			}
+		}else{
+			scene.remove(car1)
+			scene.remove(car2)
+			scene.remove(car3)
+			scene.add(car3)
+		}
 	});
 
 	var backgroundButton = document.getElementById('moveAround');
 	backgroundButton.addEventListener('click', function(){
-		controls.enabled = false;
-		controls_movement.enabled = true;
+		if(controls.enabled == true){
+			controls.enabled = false;
+			controls_movement.enabled = true;
+		}else{
+			controls.enabled = true;
+			controls_movement.enabled = false;
+		}
+		
+	});
+
+	var backgroundButton = document.getElementById('freeRotate');
+	backgroundButton.addEventListener('click', function(){
+		if (freeRotate == false){
+			freeRotate = true;
+			scene.remove(showroom);
+			scene.remove(car2);
+			scene.remove(car3);
+			scene.remove(car1); 
+			car2.position.x = car1position.x
+			car2.position.y = car1position.y
+			car2.position.z = car1position.z
+			car3.position.x = car1position.x
+			car3.position.y = car1position.y
+			car3.position.z = car1position.z
+			scene.add(car1);
+		}else{
+			freeRotate = false;
+			scene.remove(car2);
+			scene.remove(car3);
+			scene.remove(car1); 
+			init_gltf();
+			
+		}
+
+		camera.position.x = 0;
+		camera.position.y = 20;
+		camera.position.z = 200;
+		
 	});
 }
 
@@ -231,22 +304,40 @@ function init_spotLights(){
 }
 
 function keyPressed(e){
+
   switch(e.key) {
     case 'ArrowUp':
-        currentScene.rotateX(-0.05);
+    	if(freeRotate == true){
+    		car1.rotateX(-0.05);
+        	car2.rotateX(-0.05);
+        	car3.rotateX(-0.05);
+    	}
+        
         break;
     case 'ArrowDown':
-        currentScene.rotateX(0.05);
+        if(freeRotate == true){
+    		car1.rotateX(0.05);
+        	car2.rotateX(0.05);
+        	car3.rotateX(0.05);
+    	}
         break;
     case 'ArrowLeft':
-        currentScene.rotateY(-0.05);
+        if(freeRotate == true){
+    		car1.rotateY(-0.05);
+        	car2.rotateY(-0.05);
+        	car3.rotateY(-0.05);
+    	}
         break;
     case 'ArrowRight':
-        currentScene.rotateY(0.05);
+        if(freeRotate == true){
+    		car1.rotateY(0.05);
+        	car2.rotateY(0.05);
+        	car3.rotateY(0.05);
+    	}
         break;
   }
   e.preventDefault();
-  render();
+  //render();
 }
 
 
