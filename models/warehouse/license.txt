@@ -1,0 +1,11 @@
+Model Information:
+* title:	80s Warehouse
+* source:	https://sketchfab.com/3d-models/80s-warehouse-a05aff011ef04f1797013781437c18cf
+* author:	ifahto (https://sketchfab.com/ifahto)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "80s Warehouse" (https://sketchfab.com/3d-models/80s-warehouse-a05aff011ef04f1797013781437c18cf) by ifahto (https://sketchfab.com/ifahto) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
