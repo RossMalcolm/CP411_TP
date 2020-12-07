@@ -1,30 +1,36 @@
 // Setup
+var clock = new THREE.Clock();;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const prevCameraPosition = new THREE.Vector3(0, 50, 200);
+const prevTargetPosition = new THREE.Vector3(0, 0, 0);
 const renderer = new THREE.WebGLRenderer({antialias:true});
 // Lighting
-const ambientLight = new THREE.AmbientLight( 0x404040, 10);
+const ambientLight = new THREE.AmbientLight( 0x404040, 20);
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 let light;
-let spotLight
+let spotLight1;
+let spotLight2;
+let spotLight3;
 // Movement Controls
-const controls = new THREE.OrbitControls( camera, renderer.domElement );
 const controls_movement = new THREE.MapControls( camera, renderer.domElement );
-controls_movement.enableDamping = true; // an animation loop is 
-
 // Model Loader and models
 const loader = new THREE.GLTFLoader();
 var car1 = new THREE.Object3D();
 const car1position = new THREE.Vector3(-10, 59, 0);
 var car2 = new THREE.Object3D();
-const car2position = THREE.Vector3(300, 22, 0);
+const car2position = new THREE.Vector3(300, 22, 0);
 var car3 = new THREE.Object3D();
-const car3position = THREE.Vector3(600, 21, 0);
-var currentCar = new THREE.Object3D();
+const car3position = new THREE.Vector3(600, 21, 0);
+var currentCar = new THREE.Object3D;
 var showroom = new THREE.Object3D();
-// Var for slider Values
+// Vars for gui Values
 var guiValues;
 var freeRotate = false;
+// Misc
+var light1_offsetx = -10;
+var light2_offsetx = 293;
+var light3_offsetx = 594;
 
 function main() {
 	document.body.appendChild(renderer.domElement);
@@ -33,9 +39,8 @@ function main() {
 
 	// Sets the initial camera position
 	camera.position.x = 0;
-	camera.position.y = 20;
+	camera.position.y = 50;
 	camera.position.z = 200;
-
 	//initializes movement controls
 	controls_movement.dampingFactor = 0.05;
 	controls_movement.screenSpacePanning = false;
@@ -52,26 +57,17 @@ function main() {
     light = new THREE.DirectionalLight(light1_color, light1_intensity);
     light.position.set(light1_x, light1_y, light1_z);
 
-    // Sets the spotlight attributes
-	spotLight = new THREE.SpotLight( 0xffffff );
-	spotLight.position.set( 100, 1000, 100 );
-	spotLight.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
-	spotLight.castShadow = true;
-	spotLight.shadow.mapSize.width = 1024;
-	spotLight.shadow.mapSize.height = 1024;
-	spotLight.shadow.camera.near = 500;
-	spotLight.shadow.camera.far = 4000;
-	spotLight.shadow.camera.fov = 30;
-
 	// Adds the lights to the scene
 	scene.add(ambientLight);
-    scene.add(spotLight);
     scene.add(directionalLight);
     scene.add(light);
 
     // Initialise models and buttons
     init_gltf();
 	init_buttons();
+	init_spotLights();
+
+	controls_movement.enabled = true;
 
 	// Animation loop
 	animate();
@@ -81,8 +77,24 @@ function animate(){
 	requestAnimationFrame(animate);
 	controls_movement.update();
 	//directionalLight.position.copy(camera.position)
+	if (guiValues.animate_spotLights == true){
+		const time = clock.getElapsedTime();
+		spotLight1.position.x = light1_offsetx + 20*Math.sin(time );
+		spotLight1.position.z = 20*Math.cos(time );
+		spotLight1.color.setRGB(Math.abs(Math.sin(time/2)*4), Math.abs(Math.sin(time)*4), Math.abs(Math.cos(time/2)*4));
+
+		spotLight2.position.x = light2_offsetx - 20*Math.sin(time );
+		spotLight2.position.z = -20*Math.cos(time );
+		spotLight2.color.setRGB(Math.abs(Math.sin(time/3)*4), Math.abs(Math.sin(time/4)*4), Math.abs(Math.cos(time/2)*4));
+		
+		spotLight3.position.x = light3_offsetx + 20*Math.sin(time );
+		spotLight3.position.z = -20*Math.cos(time );
+		spotLight3.color.setRGB(Math.abs(Math.sin(time/5)*4), Math.abs(Math.sin(time)*4), Math.abs(Math.cos(time/5)*4));
+
+	}
 	renderer.render(scene, camera);
 }
+
 /*
       \  ^ Y
        \ |
@@ -98,8 +110,8 @@ function init_gltf(){
 		car1 = gltf.scene;
 		car1.scale.multiplyScalar(1.2); // adjust scalar factor to match your scene scale
         car1.position.x = -10; // once rescaled, position the model where needed
-        car1.position.z = 0;
         car1.position.y = 59;
+        car1.position.z = 0;
         car1.name = 'car1';
        
         //car1.visible = false;
@@ -114,8 +126,8 @@ function init_gltf(){
 		car2 = gltf.scene;
 		car2.scale.multiplyScalar(50); // adjust scalar factor to match your scene scale
         car2.position.x = 300; // once rescaled, position the model where needed
-        car2.position.z = 0;
         car2.position.y = 22;
+        car2.position.z = 0;
         car2.name = 'car2';
        
         //car2.visibile = false;
@@ -129,8 +141,8 @@ function init_gltf(){
 		car3 = gltf.scene;
 		car3.scale.multiplyScalar(45); // adjust scalar factor to match your scene scale
         car3.position.x = 600; // once rescaled, position the model where needed
-        car3.position.z = 0;
         car3.position.y = 21;
+        car3.position.z = 0;
         car3.name = 'car3';
         
         //car3.visibile = false;
@@ -144,8 +156,8 @@ function init_gltf(){
 		showroom = gltf.scene;
 		showroom.scale.multiplyScalar(40); // adjust scalar factor to match your scene scale
         showroom.position.x = -450; // once rescaled, position the model where needed
-        showroom.position.z = 0;
         showroom.position.y = -10;
+        showroom.position.z = 0;
         //showroom.visibile = false;
 		scene.add(showroom);
 	}, undefined, function (error) {
@@ -203,18 +215,6 @@ function init_buttons(){
 		}
 	});
 
-	var backgroundButton = document.getElementById('moveAround');
-	backgroundButton.addEventListener('click', function(){
-		if(controls.enabled == true){
-			controls.enabled = false;
-			controls_movement.enabled = true;
-		}else{
-			controls.enabled = true;
-			controls_movement.enabled = false;
-		}
-		
-	});
-
 	var backgroundButton = document.getElementById('freeRotate');
 	backgroundButton.addEventListener('click', function(){
 		if (freeRotate == false){
@@ -223,41 +223,104 @@ function init_buttons(){
 			scene.remove(car2);
 			scene.remove(car3);
 			scene.remove(car1); 
-			car2.position.x = car1position.x
-			car2.position.y = car1position.y
-			car2.position.z = car1position.z
-			car3.position.x = car1position.x
-			car3.position.y = car1position.y
-			car3.position.z = car1position.z
+			car1.position.x = 0;
+			car1.position.y = 0;
+			car1.position.z = 0;
+			car2.position.x = 0;
+			car2.position.y = 0;
+			car2.position.z = 0;
+			car3.position.x = 0;
+			car3.position.y = 0;
+			car3.position.z = 0;
 			scene.add(car1);
+			prevCameraPosition.x = camera.position.x;
+			prevCameraPosition.y = camera.position.y;
+			prevCameraPosition.z = camera.position.z;
+
+			prevTargetPosition.x = controls_movement.target.x;
+			prevTargetPosition.y = controls_movement.target.y;
+			prevTargetPosition.z = controls_movement.target.z;
+			
+			camera.position.x = 0;
+			camera.position.y = 20;
+			camera.position.z = 400;
+			controls_movement.target.set(0,0,0);
+			controls_movement.update();
 		}else{
 			freeRotate = false;
 			scene.remove(car2);
 			scene.remove(car3);
 			scene.remove(car1); 
 			init_gltf();
-			
-		}
+			camera.position.x = prevCameraPosition.x;
+			camera.position.y = prevCameraPosition.y;
+			camera.position.z = prevCameraPosition.z;
 
-		camera.position.x = 0;
-		camera.position.y = 20;
-		camera.position.z = 200;
+			controls_movement.target.x = prevTargetPosition.x;
+			controls_movement.target.y = prevTargetPosition.z;
+			controls_movement.target.z = prevTargetPosition.y;
+			controls_movement.update();
+		}
 		
 	});
 }
 
-function keyPressed(e){
+function init_spotLights(){
+    // Sets spotlight 1 attributes
+	spotLight1 = new THREE.SpotLight( 0xffffff );
+	spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z );
+	spotLight1.target.position.set(light1_offsetx+guiValues.light1_x, 0, guiValues.light1_z );
+	spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+	spotLight1.castShadow = true;
+	spotLight1.shadow.mapSize.width = 1024;
+	spotLight1.shadow.mapSize.height = 1024;
+	spotLight1.shadow.camera.near = 500;
+	spotLight1.shadow.camera.far = 4000;
+	spotLight1.shadow.camera.fov = 30;
+    scene.add(spotLight1);
+    scene.add(spotLight1.target);
 
+    // Sets spotlight 1 attributes
+	spotLight2 = new THREE.SpotLight( 0xffffff );
+	spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z );
+	spotLight2.target.position.set(light2_offsetx+guiValues.light2_x, 0, guiValues.light2_z );
+	spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+	spotLight2.castShadow = true;
+	spotLight2.shadow.mapSize.width = 1024;
+	spotLight2.shadow.mapSize.height = 1024;
+	spotLight2.shadow.camera.near = 500;
+	spotLight2.shadow.camera.far = 4000;
+	spotLight2.shadow.camera.fov = 30;
+    scene.add(spotLight2);
+    scene.add(spotLight2.target);
+
+    // Sets spotlight 1 attributes
+	spotLight3 = new THREE.SpotLight( 0xffffff );
+	spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z );
+	spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z );
+	spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+	spotLight3.castShadow = true;
+	spotLight3.shadow.mapSize.width = 1024;
+	spotLight3.shadow.mapSize.height = 1024;
+	spotLight3.shadow.camera.near = 500;
+	spotLight3.shadow.camera.far = 4000;
+	spotLight3.shadow.camera.fov = 30;
+    scene.add(spotLight3);
+    scene.add(spotLight3.target);
+}
+
+function keyPressed(e){
   switch(e.key) {
     case 'ArrowUp':
+    case 'w':
     	if(freeRotate == true){
     		car1.rotateX(-0.05);
         	car2.rotateX(-0.05);
         	car3.rotateX(-0.05);
     	}
-        
         break;
     case 'ArrowDown':
+    case 's':
         if(freeRotate == true){
     		car1.rotateX(0.05);
         	car2.rotateX(0.05);
@@ -265,6 +328,7 @@ function keyPressed(e){
     	}
         break;
     case 'ArrowLeft':
+    case 'a':
         if(freeRotate == true){
     		car1.rotateY(-0.05);
         	car2.rotateY(-0.05);
@@ -272,10 +336,25 @@ function keyPressed(e){
     	}
         break;
     case 'ArrowRight':
+    case 'd':
         if(freeRotate == true){
     		car1.rotateY(0.05);
         	car2.rotateY(0.05);
         	car3.rotateY(0.05);
+    	}
+        break;
+    case 'q':
+        if(freeRotate == true){
+    		car1.rotateZ(-0.05);
+        	car2.rotateZ(-0.05);
+        	car3.rotateZ(-0.05);
+    	}
+        break;
+    case 'e':
+        if(freeRotate == true){
+    		car1.rotateZ(0.05);
+        	car2.rotateZ(0.05);
+        	car3.rotateZ(0.05);
     	}
         break;
   }
@@ -286,28 +365,188 @@ function keyPressed(e){
 
 var FizzyText = function() {
   // Sets up inital values for the sliders
+ this.light1 = true;
  this.light1_R = 3.0;
  this.light1_G = 3.0;
  this.light1_B = 3.0;
+ this.light1_angle = Math.PI/3.0;
+ this.light1_x = 0.0;
+ this.light1_y = 70.0;
+ this.light1_z = 0.0;
+ this.light2 = true;
+ this.light2_R = 3.0;
+ this.light2_G = 3.0;
+ this.light2_B = 3.0;
+ this.light2_angle = Math.PI/3.0;
+ this.light2_x = 0.0;
+ this.light2_y = 70.0;
+ this.light2_z = 0.0;
+ this.light3 = true;
+ this.light3_R = 3.0;
+ this.light3_G = 3.0;
+ this.light3_B = 3.0;
+ this.light3_angle = Math.PI/3.0;
+ this.light3_x = 0.0;
+ this.light3_y = 70.0;
+ this.light3_z = 0.0;
+ this.animate_spotLights = false;
 }
 
 window.onload = function() {
   	guiValues = new FizzyText();
   	var gui = new dat.GUI();
-  	var light_1_R = gui.add(guiValues, 'light1_R', 0.0, 10.0);
-  	var light_1_G = gui.add(guiValues, 'light1_G', 0.0, 10.0);
-  	var light_1_B = gui.add(guiValues, 'light1_B', 0.0, 10.0);
+  	var light1 = gui.add(guiValues, 'light1', true, false);
+  	var light1_R = gui.add(guiValues, 'light1_R', 0.0, 10.0);
+  	var light1_G = gui.add(guiValues, 'light1_G', 0.0, 10.0);
+  	var light1_B = gui.add(guiValues, 'light1_B', 0.0, 10.0);
+  	var light1_angle = gui.add(guiValues, 'light1_angle', 0.0, Math.PI/2);
+  	var light1_x = gui.add(guiValues, 'light1_x', -75, 75);
+  	var light1_y = gui.add(guiValues, 'light1_y', 0, 70);
+  	var light1_z = gui.add(guiValues, 'light1_z', -75, 75);
+  	var light2 = gui.add(guiValues, 'light2', true, false);
+  	var light2_R = gui.add(guiValues, 'light2_R', 0.0, 10.0);
+  	var light2_G = gui.add(guiValues, 'light2_G', 0.0, 10.0);
+  	var light2_B = gui.add(guiValues, 'light2_B', 0.0, 10.0);
+  	var light2_angle = gui.add(guiValues, 'light2_angle', 0.0, Math.PI/2);
+  	var light2_x = gui.add(guiValues, 'light2_x', -75, 75);
+  	var light2_y = gui.add(guiValues, 'light2_y', 0, 70);
+  	var light2_z = gui.add(guiValues, 'light2_z', -75, 75);
+  	var light3 = gui.add(guiValues, 'light3', true, false);
+  	var light3_R = gui.add(guiValues, 'light3_R', 0.0, 10.0);
+  	var light3_G = gui.add(guiValues, 'light3_G', 0.0, 10.0);
+  	var light3_B = gui.add(guiValues, 'light3_B', 0.0, 10.0);
+  	var light3_angle = gui.add(guiValues, 'light3_angle', 0.0, Math.PI/2);
+  	var light3_x = gui.add(guiValues, 'light3_x', -75, 75);
+  	var light3_y = gui.add(guiValues, 'light3_y', 0, 70);
+  	var light3_z = gui.add(guiValues, 'light3_z', -75, 75);
+  	var animate_spotLights = gui.add(guiValues, 'animate_spotLights', true, false);
   	
-  	light_1_R.onChange(function(value) {
-		spotLight.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+  	light1.onChange(function(value) {
+		if (value == true){
+			spotLight1.intensity = 1;
+		} else {
+			spotLight1.intensity = 0;
+		}
+	});
+  	
+  	light1_R.onChange(function(value) {
+		spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
 	});
 
-  	light_1_G.onChange(function(value) {
-		spotLight.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+  	light1_G.onChange(function(value) {
+		spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
 	});
 
-  	light_1_B.onChange(function(value) {
-		spotLight.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+  	light1_B.onChange(function(value) {
+		spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+	});
+
+  	light1_angle.onChange(function(value) {
+		spotLight1.angle = value;
+	});
+
+	light1_x.onChange(function(value) {
+		spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z);
+		spotLight1.target.position.set(light1_offsetx+guiValues.light1_x, 0, guiValues.light1_z);
+	});
+
+	light1_y.onChange(function(value) {
+		spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z);
+		spotLight1.target.position.set(light1_offsetx+guiValues.light1_x, 0, guiValues.light1_z);
+	});
+
+	light1_z.onChange(function(value) {
+		spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z);
+		spotLight1.target.position.set(light1_offsetx+guiValues.light1_x, 0, guiValues.light1_z);
+	});
+  	
+  	light2.onChange(function(value) {
+		if (value == true){
+			spotLight2.intensity = 1;
+		} else {
+			spotLight2.intensity = 0;
+		}
+	});
+  	
+  	light2_R.onChange(function(value) {
+		spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+	});
+
+  	light2_G.onChange(function(value) {
+		spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+	});
+
+  	light2_B.onChange(function(value) {
+		spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+	});
+
+  	light2_angle.onChange(function(value) {
+		spotLight2.angle = value;
+	});
+
+	light2_x.onChange(function(value) {
+		spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z);
+		spotLight2.target.position.set(light2_offsetx+guiValues.light2_x, 0, guiValues.light2_z);
+	});
+
+	light2_y.onChange(function(value) {
+		spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z);
+		spotLight2.target.position.set(light2_offsetx+guiValues.light2_x, 0, guiValues.light2_z);
+	});
+
+	light2_z.onChange(function(value) {
+		spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z);
+		spotLight2.target.position.set(light2_offsetx+guiValues.light2_x, 0, guiValues.light2_z);
+	});
+  	
+  	light3.onChange(function(value) {
+		if (value == true){
+			spotLight3.intensity = 1;
+		} else {
+			spotLight3.intensity = 0;
+		}
+	});
+  	
+  	light3_R.onChange(function(value) {
+		spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+	});
+
+  	light3_G.onChange(function(value) {
+		spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+	});
+
+  	light3_B.onChange(function(value) {
+		spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+	});
+
+  	light3_angle.onChange(function(value) {
+		spotLight3.angle = value;
+	});
+
+	light3_x.onChange(function(value) {
+		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
+	});
+
+	light3_y.onChange(function(value) {
+		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
+	});
+
+	light3_z.onChange(function(value) {
+		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
+	});
+
+	animate_spotLights.onChange(function(value) {
+		if (guiValues.animate_spotLights == false){
+			spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z);
+			spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+			spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z);
+			spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+			spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
+			spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+		}
 	});
 	main();
 };
