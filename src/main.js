@@ -1,4 +1,5 @@
 // Setup
+var clock = new THREE.Clock();;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({antialias:true});
@@ -69,6 +70,21 @@ function animate(){
 	requestAnimationFrame(animate);
 	controls_movement.update();
 	//directionalLight.position.copy(camera.position)
+	if (guiValues.animate_spotLights == true){
+		const time = clock.getElapsedTime();
+		spotLight1.position.x = light1_offsetx + 20*Math.sin(time );
+		spotLight1.position.z = 20*Math.cos(time );
+		spotLight1.color.setRGB(Math.abs(Math.sin(time/2)*4), Math.abs(Math.sin(time)*4), Math.abs(Math.cos(time/2)*4));
+
+		spotLight2.position.x = light2_offsetx - 20*Math.sin(time );
+		spotLight2.position.z = -20*Math.cos(time );
+		spotLight2.color.setRGB(Math.abs(Math.sin(time/3)*4), Math.abs(Math.sin(time/4)*4), Math.abs(Math.cos(time/2)*4));
+		
+		spotLight3.position.x = light3_offsetx + 20*Math.sin(time );
+		spotLight3.position.z = -20*Math.cos(time );
+		spotLight3.color.setRGB(Math.abs(Math.sin(time/5)*4), Math.abs(Math.sin(time)*4), Math.abs(Math.cos(time/5)*4));
+
+	}
 	renderer.render(scene, camera);
 }
 /*
@@ -260,6 +276,7 @@ var FizzyText = function() {
  this.light3_x = 0.0;
  this.light3_y = 70.0;
  this.light3_z = 0.0;
+ this.animate_spotLights = false;
 }
 
 window.onload = function() {
@@ -289,6 +306,7 @@ window.onload = function() {
   	var light3_x = gui.add(guiValues, 'light3_x', -75, 75);
   	var light3_y = gui.add(guiValues, 'light3_y', 0, 70);
   	var light3_z = gui.add(guiValues, 'light3_z', -75, 75);
+  	var animate_spotLights = gui.add(guiValues, 'animate_spotLights', true, false);
   	
   	light1.onChange(function(value) {
 		if (value == true){
@@ -394,17 +412,28 @@ window.onload = function() {
 
 	light3_x.onChange(function(value) {
 		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
-		//spotLight3.target.position.set(guiValues.light3_x, 0, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
 	});
 
 	light3_y.onChange(function(value) {
 		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
-		//spotLight3.target.position.set(guiValues.light3_x, 0, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
 	});
 
 	light3_z.onChange(function(value) {
 		spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
-		//spotLight3.target.position.set(guiValues.light3_x, 0, guiValues.light3_z);
+		spotLight3.target.position.set(light3_offsetx+guiValues.light3_x, 0, guiValues.light3_z);
+	});
+
+	animate_spotLights.onChange(function(value) {
+		if (guiValues.animate_spotLights == false){
+			spotLight1.position.set(light1_offsetx+guiValues.light1_x, guiValues.light1_y, guiValues.light1_z);
+			spotLight1.color.setRGB(guiValues.light1_R, guiValues.light1_G, guiValues.light1_B);
+			spotLight2.position.set(light2_offsetx+guiValues.light2_x, guiValues.light2_y, guiValues.light2_z);
+			spotLight2.color.setRGB(guiValues.light2_R, guiValues.light2_G, guiValues.light2_B);
+			spotLight3.position.set(light3_offsetx+guiValues.light3_x, guiValues.light3_y, guiValues.light3_z);
+			spotLight3.color.setRGB(guiValues.light3_R, guiValues.light3_G, guiValues.light3_B);
+		}
 	});
 	main();
 };
